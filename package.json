@@ -13,12 +13,14 @@
     "dotenv": "^17.2.3",
     "gh-pages": "^6.1.1",
     "jquery": "^3.7.1",
+    "mdb-react-ui-kit": "^9.0.0",
     "react": "^18.3.1",
     "react-awesome-reveal": "^4.2.11",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^18.3.1",
     "react-loader-spinner": "^6.1.6",
     "react-owl-carousel": "^2.3.3",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^6.30.2",
     "react-scripts": "5.0.1",
     "react-slick": "^0.30.2",
     "react-spinners": "^0.13.8",
@@ -26,7 +28,8 @@
     "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.14.5",
     "swiper": "^11.1.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zustand": "^5.0.9"
   },
   "scripts": {
     "start": "react-scripts start",

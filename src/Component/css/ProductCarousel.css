@@ -1,0 +1,231 @@
+/* ===========================
+   Product Card Base
+   =========================== */
+.card-product {
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 100%;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-product:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+/* Card body must stretch so footer is aligned */
+.card-product .card-body {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+}
+
+/* Wrap all content except image inside this in JSX */
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===========================
+   Image Area – no cropping, equal height
+   =========================== */
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 230px;          /* same height for every card */
+  margin-bottom: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+.product-image-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;    /* show full product without cutting */
+  transition: transform 0.4s ease;
+  background: #f8f9fa;
+}
+
+.card-product:hover .product-image {
+  transform: scale(1.03);
+}
+
+/* ===========================
+   Quick View & Wishlist
+   =========================== */
+.btn-quick-view {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.95);
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333333;
+  font-size: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  z-index: 4 !important;
+}
+
+.btn-quick-view:hover {
+  background: #0aad0a;
+  color: #ffffff;
+  border-color: #0aad0a;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(10,173,10,0.4);
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.95);
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333333;
+  font-size: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  z-index: 4 !important;
+}
+
+.wishlist-btn:hover {
+  background: #dc3545;
+  color: #ffffff;
+  border-color: #dc3545;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(220,53,69,0.4);
+}
+
+/* ===========================
+   Badges / Text
+   =========================== */
+.badge {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.fs-2rem {
+  font-size: 0.75rem !important;
+}
+
+.product-name {
+  min-height: 44px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Price & footer alignment */
+.product-price-row {
+  margin-top: auto;          /* pushes price + button to bottom of card */
+}
+
+/* ===========================
+   Slick Slider – equal card height
+   =========================== */
+.slick-slide {
+  padding: 8px 4px;
+}
+
+/* Important: stretch slide & card */
+.slick-slide > div {
+  height: 100%;
+  display: flex;
+}
+
+.slick-slide > div > .card-product {
+  height: 100%;
+}
+
+/* Arrows */
+.slick-prev,
+.slick-next {
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.95) !important;
+  border-radius: 50%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  z-index: 3;
+  transition: all 0.3s ease;
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  background: #0aad0a !important;
+  box-shadow: 0 6px 20px rgba(10,173,10,0.4);
+}
+
+.slick-prev:before,
+.slick-next:before {
+  color: #333333 !important;
+  font-size: 20px;
+}
+
+.slick-prev:hover:before,
+.slick-next:hover:before {
+  color: #ffffff !important;
+}
+
+.slick-prev { left: -25px !important; }
+.slick-next { right: -25px !important; }
+
+/* ===========================
+   Buttons
+   =========================== */
+.btn-primary {
+  background: #0aad0a !important;
+  border-color: #0aad0a !important;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: #089108 !important;
+  border-color: #089108 !important;
+  transform: translateY(-1px);
+}
+
+/* ===========================
+   Responsive
+   =========================== */
+@media (max-width: 768px) {
+  .slick-prev { left: -15px !important; }
+  .slick-next { right: -15px !important; }
+
+  .image-container {
+    height: 200px;
+  }
+}

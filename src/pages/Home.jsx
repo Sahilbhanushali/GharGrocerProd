@@ -33,19 +33,40 @@ import ProductItem from "../ProductList/ProductItem";
 import Slider from "react-slick";
 import { axiosInstance } from "../lib/axios.js";
 
-// import "slick-carousel/slick/slick.css";
-// import "slick-carousel/slick/slick-theme.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import { Slide, Zoom } from "react-awesome-reveal";
 import { useEffect } from "react";
-// import { PulseLoader } from 'react-spinners';
 import { MagnifyingGlass } from "react-loader-spinner";
 import FAQ from "./FooterElements/Faq";
+import  {fetchImagePathFromENV}  from "../api/helpers/fetcheImagesPathFromENV.js";
+
+import {FetchALlCategoryGroupsDetails} from "../api/helpers/fetchCategoryGroups.js";
+import QuickViewModal from "../Component/QuickViewModal.jsx";
+import ProductCarousel from "../Component/ProductCarousel.jsx";
+
 const Home = () => {
+  
   const [isVisible, setIsVisible] = useState(false);
   const [siteDetails, setSiteDetails] = useState(null);
   const [bannerImages, setBannerImages] = useState([]);
+  const [categories, setCategories] = useState([]); 
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
-  const [categoryGroups, setCategoryGroups] = useState(null);
+   const [quickViewModal, setQuickViewModal] = useState({
+    show: false,
+    productId: null
+  });
+
+  const handleQuickView = (productId) => {
+    setQuickViewModal({ show: true, productId });
+  };
+
+  const handleCloseQuickView = () => {
+    setQuickViewModal({ show: false, productId: null });
+  };
+
+ 
 
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
@@ -70,7 +91,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // getting Site details API and setting to local storage
+  
     const fetchSiteDetails = async () => {
       try {
         const response = await axiosInstance.get("/pages");
@@ -104,23 +125,21 @@ const Home = () => {
     fetchSiteDetails();
   }, []);
 
-  useEffect(() => {
-    const categoryGroupsDetails = async () => {
+   useEffect(() => {
+    const fetchCategories = async () => {
       try {
-        const categoryGroupResponse = await axiosInstance.get(
-          "/category_group",
-          {
-            params: {
-              per_page: 20,
-            },
-          }
-        );
-        setCategoryGroups(categoryGroupResponse.data.data.data);
+        setLoadingCategories(true);
+        const categoryData = await FetchALlCategoryGroupsDetails();
+        setCategories(categoryData);
       } catch (error) {
-        console.error("Error fetching category groups:", error);
+        console.error("Error fetching categories:", error);
+        setCategories([]); // Set empty array on error
+      } finally {
+        setLoadingCategories(false);
       }
     };
-    categoryGroupsDetails();
+    
+    fetchCategories();
   }, []);
 
   const settings1 = {
@@ -296,7 +315,7 @@ const Home = () => {
                           <div
                             style={{
                               background: `url(${
-                                process.env.REACT_APP_BASE_IMAGE_PATH + img
+                               fetchImagePathFromENV() + img
                               }) no-repeat`,
                               backgroundSize: "cover",
                               borderRadius: ".5rem",
@@ -507,7 +526,7 @@ const Home = () => {
                     </div>
 
                     <div className="row">
-                      {categoryGroups.map((category) => (
+                      {categories.map((category) => (
                         <div
                           key={category.id}
                           className="col-lg-2 col-md-4 col-6 fade-zoom"
@@ -518,15 +537,15 @@ const Home = () => {
                               <Link to={`/categories/${category.id}`}>
                                 <img
                                   src={`${
-                                    process.env.REACT_APP_BASE_IMAGE_PATH +
+                                    fetchImagePathFromENV() +
                                     category.image
                                   }`}
                                   alt={category.name.toLowerCase()}
                                   className="card-image rounded-circle"
                                   style={{
-                                    width: 100,
+                                    width: 120,
                                     height: 100,
-                                    objectFit: "cover",
+                                    objectFit: "contain",
                                   }}
                                 />
                               </Link>
@@ -614,7 +633,11 @@ const Home = () => {
               </section>
             </>
             <>
-              <ProductItem />
+              <ProductCarousel 
+        title="Popular Products"
+        categoryId={null}
+        limit={10}
+      />
             </>
             <>
               {/* cta section */}
@@ -672,19 +695,11 @@ const Home = () => {
                                 Phone
                               </label>
                             </div>
-                            {/* form */}
-                            {/* <form className="row g-3 mt-2">
-
-          
-          <div className="col-6 ">
-            
-            <input type="text" className="form-control" placeholder="Phone">
-          </div>
-           
-          <div className="col-6">
-            <button type="submit" className="btn btn-primary mb-3">Share app link</button>
-          </div>
-        </form> */}
+                      <QuickViewModal
+        show={quickViewModal.show}
+        handleClose={handleCloseQuickView}
+        productId={quickViewModal.productId}
+      />
                           </div>
                           <div>
                             {/* app */}

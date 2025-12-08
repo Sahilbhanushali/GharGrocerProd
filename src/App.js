@@ -37,6 +37,7 @@ import FAQ from "./pages/FooterElements/Faq";
 import Coupons from "./pages/FooterElements/Coupons";
 import Careers from "./pages/FooterElements/Careers";
 import HelpCenter from "./pages/FooterElements/HelpCenter";
+import CompleteProfile from "./Component/completeProfile.jsx";
 const App = () => {
   return (
     <div>
@@ -73,6 +74,8 @@ const App = () => {
           <Route path="/Coupons" element={<Coupons />} />
           <Route path="/Careers" element={<Careers />} />
           <Route path="/helpcenter" element={<HelpCenter />} />
+          {/* Complete Profile */}
+          <Route path="/complete-profile" element={<CompleteProfile />} />
         </Routes>
         <Footer/>
       </Router>
