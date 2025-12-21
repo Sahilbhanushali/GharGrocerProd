@@ -1,10 +1,7 @@
 import {ProductApi} from "../products/product.api.js";
 
 
-export const fetchProducts = async(params = {
-    // discounted_product : 1,
-    per_page : 10,
-}) => {
+export const fetchProducts = async(params) => {
     try {
         const response = await ProductApi.fetchAllProducts(params);
         return response.data.data;

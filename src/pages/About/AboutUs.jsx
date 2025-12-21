@@ -277,7 +277,7 @@ const AboutUs = () => {
                     <a
                       href="https://www.youtube.com/watch?v=zPo5ZaH6sW8"
                       className="gallery-item video-item is-hovered rounded-3"
-                      data-sub-html='<h6 class="fs-sm text-light">Silicon Inc. Showreel by Marvin McKinney</h6>'
+                      data-sub-html='<h6 className="fs-sm text-light">Silicon Inc. Showreel by Marvin McKinney</h6>'
                     >
                       <img src={member8} alt="Gallery thumbnail" />
                       <div className="gallery-item-caption p-4">
@@ -290,7 +290,7 @@ const AboutUs = () => {
                     <a
                       href={member2}
                       className="gallery-item rounded-3 mb-4"
-                      data-sub-html='<h6 class="fs-sm text-light">Program for apprentices</h6>'
+                      data-sub-html='<h6 className="fs-sm text-light">Program for apprentices</h6>'
                     >
                       <img
                         src={member2}
@@ -304,7 +304,7 @@ const AboutUs = () => {
                     <a
                       href={member5}
                       className="gallery-item rounded-3"
-                      data-sub-html='<h6 class="fs-sm text-light">Modern bright offices</h6>'
+                      data-sub-html='<h6 className="fs-sm text-light">Modern bright offices</h6>'
                     >
                       <img src={member5} alt="Gallery thumbnail" />
                       <div className="gallery-item-caption fs-sm fw-medium">
@@ -316,7 +316,7 @@ const AboutUs = () => {
                     <a
                       href={member6}
                       className="gallery-item rounded-3 mb-4"
-                      data-sub-html='<h6 class="fs-sm text-light">Friendly professional team</h6>'
+                      data-sub-html='<h6 className="fs-sm text-light">Friendly professional team</h6>'
                     >
                       <img
                         src={member6}
@@ -330,7 +330,7 @@ const AboutUs = () => {
                     <a
                       href={member7}
                       className="gallery-item rounded-3"
-                      data-sub-html='<h6 class="fs-sm text-light">Efficient project management</h6>'
+                      data-sub-html='<h6 className="fs-sm text-light">Efficient project management</h6>'
                     >
                       <img src={member7} alt="Gallery thumbnail" />
                       <div className="gallery-item-caption fs-sm fw-medium">

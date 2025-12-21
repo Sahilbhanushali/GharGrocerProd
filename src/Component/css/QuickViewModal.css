@@ -1,0 +1,80 @@
+/* QuickViewModal Perfect Styles */
+.qv-modal .modal-dialog {
+  max-width: 90vw !important;
+  margin: 1.5rem auto !important;
+  border-radius: 24px !important;
+}
+
+.qv-modal .modal-content {
+  border: none !important;
+  border-radius: 24px !important;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.3) !important;
+  overflow: hidden !important;
+  max-height: 95vh !important;
+}
+
+.qv-modal .modal-body {
+  padding: 0 !important;
+  max-height: 75vh !important;
+  overflow: hidden !important;
+}
+
+.qv-image-container {
+  height: 340px !important;
+  border-radius: 20px !important;
+}
+
+.qv-main-img {
+  object-fit: cover !important;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.qv-thumbnails {
+  scrollbar-width: none !important;
+}
+
+.qv-thumb {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.qv-thumb:hover {
+  transform: translateY(-4px) scale(1.08) !important;
+}
+
+.qv-thumb-active {
+  transform: scale(1.05) !important;
+}
+
+.qty-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05) !important;
+  background: linear-gradient(135deg, #00a82d, #00c73d) !important;
+  color: white !important;
+}
+
+.btn-glow-effect {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.7s;
+}
+
+.qv-cart-btn:hover .btn-glow-effect {
+  left: 100% !important;
+}
+
+.hover-scale {
+  transition: all 0.2s ease !important;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05) !important;
+}
+
+@media (max-width: 768px) {
+  .qv-modal .modal-dialog { margin: 0.5rem !important; }
+  .qv-image-container { height: 280px !important; }
+  .qv-main-img { border-radius: 16px !important; }
+}

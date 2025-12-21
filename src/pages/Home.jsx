@@ -39,21 +39,28 @@ import { Slide, Zoom } from "react-awesome-reveal";
 import { useEffect } from "react";
 import { MagnifyingGlass } from "react-loader-spinner";
 import FAQ from "./FooterElements/Faq";
-import  {fetchImagePathFromENV}  from "../api/helpers/fetcheImagesPathFromENV.js";
+import { fetchImagePathFromENV } from "../api/helpers/fetcheImagesPathFromENV.js";
 
-import {FetchALlCategoryGroupsDetails} from "../api/helpers/fetchCategoryGroups.js";
+import { FetchALlCategoryGroupsDetails } from "../api/helpers/fetchCategoryGroups.js";
+import { useCartStore } from "../stores/useCartStore.js";
 import QuickViewModal from "../Component/QuickViewModal.jsx";
 import ProductCarousel from "../Component/ProductCarousel.jsx";
+import { fetchProducts } from "../api/helpers/fetchProducts.js"
+import "../pages/css/Home.css"
+import Swal from "sweetalert2";
 
 const Home = () => {
-  
+
   const [isVisible, setIsVisible] = useState(false);
   const [siteDetails, setSiteDetails] = useState(null);
   const [bannerImages, setBannerImages] = useState([]);
-  const [categories, setCategories] = useState([]); 
+  const [categories, setCategories] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [loadingFeaturedProducts, setLoadingFeaturedProducts] = useState(true);
+  const addToCart = useCartStore((state) => state.addToCart);
 
-   const [quickViewModal, setQuickViewModal] = useState({
+  const [quickViewModal, setQuickViewModal] = useState({
     show: false,
     productId: null
   });
@@ -66,7 +73,18 @@ const Home = () => {
     setQuickViewModal({ show: false, productId: null });
   };
 
- 
+  const handleAddToCart = (product) => {
+    addToCart(product);
+    Swal.fire({
+      icon: 'success',
+      title: 'Added to Cart',
+      text: `${product.name} has been added to your cart!`,
+      showConfirmButton: false,
+      timer: 900,
+    });
+  };
+
+
 
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
@@ -91,7 +109,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-  
+
     const fetchSiteDetails = async () => {
       try {
         const response = await axiosInstance.get("/pages");
@@ -116,8 +134,6 @@ const Home = () => {
         setSiteDetails(siteDetails);
 
         localStorage.setItem("siteDetails", JSON.stringify(siteDetails));
-
-        console.log("All site details stored in localStorage");
       } catch (error) {
         console.error("Error fetching site details:", error);
       }
@@ -125,7 +141,7 @@ const Home = () => {
     fetchSiteDetails();
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoadingCategories(true);
@@ -138,9 +154,29 @@ const Home = () => {
         setLoadingCategories(false);
       }
     };
-    
+
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoadingFeaturedProducts(true);
+        const featuredProductsData = await fetchProducts({ featured: 1 });
+
+        setFeaturedProducts(featuredProductsData.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setFeaturedProducts([]); // Set empty array on error
+      } finally {
+        setLoadingFeaturedProducts(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+
+  }, [])
 
   const settings1 = {
     dots: true,
@@ -308,15 +344,13 @@ const Home = () => {
                       {bannerImages.map((img, index) => (
                         <div
                           key={index}
-                          className={`carousel-item ${
-                            index === 0 ? "active" : ""
-                          }`}
+                          className={`carousel-item ${index === 0 ? "active" : ""
+                            }`}
                         >
                           <div
                             style={{
-                              background: `url(${
-                               fetchImagePathFromENV() + img
-                              }) no-repeat`,
+                              background: `url(${fetchImagePathFromENV() + img
+                                }) no-repeat`,
                               backgroundSize: "cover",
                               borderRadius: ".5rem",
                               backgroundPosition: "center",
@@ -406,98 +440,98 @@ const Home = () => {
                   {/* row */}
                   <div className="row">
                     <div className="col-lg-4 col-md-6 col-12 fade-in-left">
-                      <Slide direction="left">
-                        <div className=" banner mb-3">
-                          {/* Banner Content */}
-                          <div className="position-relative">
-                            {/* Banner Image */}
-                            <img
-                              src={adbanner1}
-                              alt="ad-banner"
-                              className="img-fluid rounded-3 w-100"
-                            />
-                            <div className="banner-text">
-                              <h3 className="mb-0 fw-bold">
-                                10% cashback on <br />
-                                personal care{" "}
-                              </h3>
-                              <div className="mt-4 mb-5 fs-5">
-                                <p className="mb-0">Max cashback: $12</p>
-                                <span>
-                                  Code:{" "}
-                                  <span className="fw-bold text-dark">
-                                    CARE12
-                                  </span>
+                      {/* <Slide direction="left"> */}
+                      <div className=" banner mb-3">
+                        {/* Banner Content */}
+                        <div className="position-relative">
+                          {/* Banner Image */}
+                          <img
+                            src={adbanner1}
+                            alt="ad-banner"
+                            className="img-fluid rounded-3 w-100"
+                          />
+                          <div className="banner-text">
+                            <h3 className="mb-0 fw-bold">
+                              10% cashback on <br />
+                              personal care{" "}
+                            </h3>
+                            <div className="mt-4 mb-5 fs-5">
+                              <p className="mb-0">Max cashback: $12</p>
+                              <span>
+                                Code:{" "}
+                                <span className="fw-bold text-dark">
+                                  CARE12
                                 </span>
-                              </div>
-                              <Link to="#" className="btn btn-dark">
-                                Shop Now
-                              </Link>
+                              </span>
                             </div>
-                            {/* Banner Content */}
+                            <Link to="#" className="btn btn-dark">
+                              Shop Now
+                            </Link>
                           </div>
+                          {/* Banner Content */}
                         </div>
-                      </Slide>
+                      </div>
+                      {/* </Slide> */}
                     </div>
 
                     <div className="col-lg-4 col-md-6  col-12 slide-in-top">
-                      <Zoom>
-                        <div className="banner mb-3 ">
-                          {/* Banner Content */}
-                          <div className="position-relative">
-                            {/* Banner Image */}
-                            <img
-                              src={adbanner2}
-                              alt="ad-banner-2"
-                              className="img-fluid rounded-3 w-100"
-                            />
-                            <div className="banner-text">
-                              {/* Banner Content */}
-                              <h3 className=" fw-bold mb-2">
-                                Say yes to <br />
-                                season’s fresh{" "}
-                              </h3>
-                              <p className="fs-5">
-                                Refresh your day <br />
-                                the fruity way
-                              </p>
-                              <Link to="#" className="btn btn-dark mt-2">
-                                Shop Now
-                              </Link>
-                            </div>
+                      {/* <Zoom> */}
+                      <div className="banner mb-3 ">
+                        {/* Banner Content */}
+                        <div className="position-relative">
+                          {/* Banner Image */}
+                          <img
+                            src={adbanner2}
+                            alt="ad-banner-2"
+                            className="img-fluid rounded-3 w-100"
+                          />
+                          <div className="banner-text">
+                            {/* Banner Content */}
+                            <h3 className=" fw-bold mb-2">
+                              Say yes to <br />
+                              season’s fresh{" "}
+                            </h3>
+                            <p className="fs-5">
+                              Refresh your day <br />
+                              the fruity way
+                            </p>
+                            <Link to="#" className="btn btn-dark mt-2">
+                              Shop Now
+                            </Link>
                           </div>
                         </div>
-                      </Zoom>
+                      </div>
+                      {/* </Zoom> */}
                     </div>
                     <div className="col-lg-4 col-12 fade-in-left ">
-                      <Slide direction="right">
-                        <div className="banner mb-3">
-                          <div className="banner-img">
-                            {/* Banner Image */}
-                            <img
-                              src={adbanner3}
-                              alt="ad-banner-3"
-                              className="img-fluid rounded-3 w-100"
-                            />
-                            {/* Banner Content */}
-                            <div className="banner-text">
-                              <h3 className="fs-2 fw-bold lh-1 mb-2">
-                                When in doubt,
-                                <br />
-                                eat ice cream{" "}
-                              </h3>
-                              <p className="fs-5">
-                                Enjoy a scoop of
-                                <br />
-                                summer today
-                              </p>
-                              <Link to="#" className="btn btn-dark">
-                                Shop Now
-                              </Link>
-                            </div>
+                      {/* <Slide direction="right"> */}
+                      <div className="banner mb-3">
+                        <div className="banner-img">
+                          {/* Banner Image */}
+                          <img
+                            src={adbanner3}
+                            alt="ad-banner-3"
+                            className="img-fluid rounded-3 w-100"
+                          />
+                          {/* Banner Content */}
+                          <div className="banner-text">
+                            <h3 className="fs-2 fw-bold lh-1 mb-2">
+                              When in doubt,
+                              <br />
+                              eat ice cream{" "}
+                            </h3>
+                            <p className="fs-5">
+                              Enjoy a scoop of
+                              <br />
+                              summer today
+                            </p>
+                            <Link to="#" className="btn btn-dark">
+                              Shop Now
+                            </Link>
                           </div>
                         </div>
-                      </Slide>
+                      </div>
+                      {/* </Slide> */}
                     </div>
                   </div>
                 </div>
@@ -536,10 +570,9 @@ const Home = () => {
                               {/* img */}
                               <Link to={`/categories/${category.id}`}>
                                 <img
-                                  src={`${
-                                    fetchImagePathFromENV() +
+                                  src={`${fetchImagePathFromENV() +
                                     category.image
-                                  }`}
+                                    }`}
                                   alt={category.name.toLowerCase()}
                                   className="card-image rounded-circle"
                                   style={{
@@ -633,11 +666,11 @@ const Home = () => {
               </section>
             </>
             <>
-              <ProductCarousel 
-        title="Popular Products"
-        categoryId={null}
-        limit={10}
-      />
+              <ProductCarousel
+                title="Popular Products"
+                categoryId={null}
+                limit={10}
+              />
             </>
             <>
               {/* cta section */}
@@ -695,11 +728,11 @@ const Home = () => {
                                 Phone
                               </label>
                             </div>
-                      <QuickViewModal
-        show={quickViewModal.show}
-        handleClose={handleCloseQuickView}
-        productId={quickViewModal.productId}
-      />
+                            <QuickViewModal
+                              show={quickViewModal.show}
+                              handleClose={handleCloseQuickView}
+                              productId={quickViewModal.productId}
+                            />
                           </div>
                           <div>
                             {/* app */}
@@ -751,7 +784,9 @@ const Home = () => {
               </section>
             </>
             <>
-              <section>
+             // Replace your Daily Best Sells section with this improved version
+
+              <section className="my-lg-14 my-8">
                 <div className="container">
                   <div className="row">
                     <div className="col-md-12 mb-6">
@@ -761,25 +796,26 @@ const Home = () => {
                         </h3>
                         <div className="wt-separator bg-primarys"></div>
                         <div className="wt-separator2 bg-primarys"></div>
-                        {/* <p>Connecting with entrepreneurs online, is just a few clicks away.</p> */}
                       </div>
                     </div>
                   </div>
-                  <div className="row row-cols-1 row-cols-md-3 g-4">
-                    <div className="col-md-3 fade-in-left">
+
+                  <div className="row g-4">
+                    {/* Banner Column */}
+                    <div className="col-lg-3 col-md-12 fade-in-left">
                       <div
-                        className=" pt-8 px-8 rounded-3"
+                        className="daily-best-sells-banner rounded-3"
                         style={{
-                          background: `url(${bannerdeal})no-repeat`,
+                          background: `url(${bannerdeal}) no-repeat`,
                           backgroundSize: "cover",
-                          height: 400,
+                          backgroundPosition: "center",
                         }}
                       >
                         <div>
-                          <h3 className="fw-bold text-white">
+                          <h3 className="fw-bold text-white mb-2">
                             100% Organic Coffee Beans.
                           </h3>
-                          <p className="text-white">
+                          <p className="text-white mb-4">
                             Get the best deal before close.
                           </p>
                           <Link to="#!" className="btn btn-primary">
@@ -789,465 +825,141 @@ const Home = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-9 ">
-                      <div className="image-itemss">
+
+                    {/* Products Slider Column */}
+                    <div className="col-lg-9 col-md-12">
+                      <div className="daily-best-sells-slider">
                         <Slider {...settings1}>
-                          <div className="images swiper-slide px-4 ">
-                            <div className="col ">
-                              <div className="card card-product">
-                                <div className="card-body">
-                                  <div className="text-center  position-relative ">
-                                    {" "}
-                                    <Link to="#!">
-                                      <img
-                                        src={product11}
-                                        alt="Grocery Ecommerce Template"
-                                        className="mb-3 img-fluid"
-                                      />
-                                    </Link>
-                                    <div className="card-product-action">
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#quickViewModal"
-                                      >
-                                        <i
-                                          className="bi bi-eye"
-                                          data-bs-toggle="tooltip"
-                                          data-bs-html="true"
-                                          title="Quick View"
+                          {featuredProducts.map((product) => (
+                            <div className="images swiper-slide" key={product.id}>
+                              <div className="col">
+                                <div className="card card-product">
+                                  <div className="card-body">
+                                    {/* Product Image Container */}
+                                    <div className="text-center position-relative">
+                                      <Link to={`/product/${product.id}`}>
+                                        <img
+                                          src={
+                                            product.images?.[0]
+                                              ? fetchImagePathFromENV() + product.images[0]
+                                              : "https://via.placeholder.com/200x200?text=No+Image"
+                                          }
+                                          alt={product.name}
+                                          className="img-fluid"
+                                          loading="lazy"
+                                          onError={(e) => {
+                                            e.target.src = "https://via.placeholder.com/200x200?text=No+Image";
+                                          }}
                                         />
                                       </Link>
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Wishlist"
-                                      >
-                                        <i className="bi bi-heart" />
-                                      </Link>
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Compare"
-                                      >
-                                        <i className="bi bi-arrow-left-right" />
-                                      </Link>
+
+                                      {/* Product Action Buttons (optional - quick view, wishlist) */}
+                                      <div className="card-product-action">
+                                        {/* Add your action buttons here if needed */}
+                                      </div>
                                     </div>
-                                  </div>
-                                  <div className="text-small mb-1">
-                                    <Link
-                                      to="#!"
-                                      className="text-decoration-none text-muted"
-                                    >
-                                      <small>Fruits &amp; Vegetables</small>
-                                    </Link>
-                                  </div>
-                                  <h2 className="fs-6">
-                                    <Link
-                                      to="#!"
-                                      className="text-inherit text-decoration-none"
-                                    >
-                                      Golden Pineapple
-                                    </Link>
-                                  </h2>
-                                  <div className="d-flex justify-content-between align-items-center mt-3">
-                                    <div>
-                                      <span className="text-dark">$13</span>{" "}
-                                      <span className="text-decoration-line-through text-muted">
-                                        $18
-                                      </span>
+
+                                    {/* Card Content Wrapper */}
+                                    <div className="card-content">
+                                      {/* Category */}
+                                      <div className="text-small mb-1">
+                                        <Link
+                                          to={`/categories/${product.categories?.[0]?.id || '#'}`}
+                                          className="text-decoration-none text-muted"
+                                        >
+                                          <small>
+                                            {product.categories?.[0]?.name || "Category"}
+                                          </small>
+                                        </Link>
+                                      </div>
+
+                                      {/* Product Name */}
+                                      <h2 className="fs-6 mb-2">
+                                        <Link
+                                          to={`/product/${product.id}`}
+                                          className="text-inherit text-decoration-none"
+                                          title={product.name}
+                                        >
+                                          {product.name}
+                                        </Link>
+                                      </h2>
+
+                                      {/* Price and Rating */}
+                                      <div className="d-flex justify-content-between align-items-center">
+                                        <div>
+                                          <span className="text-dark">
+                                            ₹{parseFloat(product.price).toFixed(2)}
+                                          </span>
+                                          {product.old_price && parseFloat(product.old_price) > 0 && (
+                                            <>
+                                              {" "}
+                                              <span className="text-decoration-line-through text-muted">
+                                                ₹{parseFloat(product.old_price).toFixed(2)}
+                                              </span>
+                                            </>
+                                          )}
+                                        </div>
+
+                                        <div className="d-flex align-items-center gap-1">
+                                          <small className="text-warning">
+                                            {[...Array(5)].map((_, index) => (
+                                              <i
+                                                key={index}
+                                                className={
+                                                  index < 4
+                                                    ? "bi bi-star-fill"
+                                                    : "bi bi-star-half"
+                                                }
+                                              />
+                                            ))}
+                                          </small>
+                                          <span className="ms-1">
+                                            <small className="text-muted">4.5</small>
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      {/* Add to Cart Button */}
+                                      <div className="d-grid">
+                                        <button
+                                          className="btn btn-primary"
+                                          onClick={() => handleAddToCart(product)}
+                                          disabled={product.qty <= 0}
+                                        >
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width={16}
+                                            height={16}
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth={2}
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="feather feather-plus me-1"
+                                          >
+                                            <line x1={12} y1={5} x2={12} y2={19} />
+                                            <line x1={5} y1={12} x2={19} y2={12} />
+                                          </svg>
+                                          Add to cart
+                                        </button>
+                                      </div>
+
+                                      {/* Countdown Timer (optional) */}
+                                      <div className="d-flex justify-content-start text-center">
+                                        <div
+                                          className="deals-countdown w-100"
+                                          data-countdown="2025/12/31 23:59:59"
+                                        >
+                                          {/* Add your countdown component here if you have one */}
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div>
-                                      <small className="text-warning">
-                                        {" "}
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-half" />
-                                      </small>
-                                      <span>
-                                        <small>4.5</small>
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="d-grid mt-2">
-                                    <Link to="#!" className="btn btn-primary ">
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width={16}
-                                        height={16}
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth={2}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className="feather feather-plus"
-                                      >
-                                        <line x1={12} y1={5} x2={12} y2={19} />
-                                        <line x1={5} y1={12} x2={19} y2={12} />
-                                      </svg>{" "}
-                                      Add to cart{" "}
-                                    </Link>
-                                  </div>
-                                  <div className="d-flex justify-content-start text-center mt-3">
-                                    <div
-                                      className="deals-countdown w-100"
-                                      data-countdown="2022/11/11 00:00:00"
-                                    />
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="images swiper-slide px-4">
-                            <div className="col">
-                              <div className="card card-product">
-                                <div className="card-body">
-                                  <div className="text-center  position-relative ">
-                                    {" "}
-                                    <Link to="#!">
-                                      <img
-                                        src={product12}
-                                        alt="Grocery Ecommerce Template"
-                                        className="mb-3 img-fluid"
-                                      />
-                                    </Link>
-                                    <div className="card-product-action">
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#quickViewModal"
-                                      >
-                                        <i
-                                          className="bi bi-eye"
-                                          data-bs-toggle="tooltip"
-                                          data-bs-html="true"
-                                          title="Quick View"
-                                        />
-                                      </Link>
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Wishlist"
-                                      >
-                                        <i className="bi bi-heart" />
-                                      </Link>
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Compare"
-                                      >
-                                        <i className="bi bi-arrow-left-right" />
-                                      </Link>
-                                    </div>
-                                  </div>
-                                  <div className="text-small mb-1">
-                                    <Link
-                                      to="#!"
-                                      className="text-decoration-none text-muted"
-                                    >
-                                      <small>Fruits &amp; Vegetables</small>
-                                    </Link>
-                                  </div>
-                                  <h2 className="fs-6">
-                                    <Link
-                                      to="#!"
-                                      className="text-inherit text-decoration-none"
-                                    >
-                                      Golden Pineapple
-                                    </Link>
-                                  </h2>
-                                  <div className="d-flex justify-content-between align-items-center mt-3">
-                                    <div>
-                                      <span className="text-dark">$13</span>{" "}
-                                      <span className="text-decoration-line-through text-muted">
-                                        $18
-                                      </span>
-                                    </div>
-                                    <div>
-                                      <small className="text-warning">
-                                        {" "}
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-half" />
-                                      </small>
-                                      <span>
-                                        <small>4.5</small>
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="d-grid mt-2">
-                                    <Link to="#!" className="btn btn-primary ">
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width={16}
-                                        height={16}
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth={2}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className="feather feather-plus"
-                                      >
-                                        <line x1={12} y1={5} x2={12} y2={19} />
-                                        <line x1={5} y1={12} x2={19} y2={12} />
-                                      </svg>{" "}
-                                      Add to cart{" "}
-                                    </Link>
-                                  </div>
-                                  <div className="d-flex justify-content-start text-center mt-3">
-                                    <div
-                                      className="deals-countdown w-100"
-                                      data-countdown="2022/11/11 00:00:00"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="images swiper-slide px-4">
-                            <div className="col">
-                              <div className="card card-product">
-                                <div className="card-body">
-                                  <div className="text-center  position-relative ">
-                                    {" "}
-                                    <Link to="#!">
-                                      <img
-                                        src={product13}
-                                        alt="Grocery Ecommerce Template"
-                                        className="mb-3 img-fluid"
-                                      />
-                                    </Link>
-                                    <div className="card-product-action">
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#quickViewModal"
-                                      >
-                                        <i
-                                          className="bi bi-eye"
-                                          data-bs-toggle="tooltip"
-                                          data-bs-html="true"
-                                          title="Quick View"
-                                        />
-                                      </Link>
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Wishlist"
-                                      >
-                                        <i className="bi bi-heart" />
-                                      </Link>
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Compare"
-                                      >
-                                        <i className="bi bi-arrow-left-right" />
-                                      </Link>
-                                    </div>
-                                  </div>
-                                  <div className="text-small mb-1">
-                                    <Link
-                                      to="#!"
-                                      className="text-decoration-none text-muted"
-                                    >
-                                      <small>Fruits &amp; Vegetables</small>
-                                    </Link>
-                                  </div>
-                                  <h2 className="fs-6">
-                                    <Link
-                                      to="#!"
-                                      className="text-inherit text-decoration-none"
-                                    >
-                                      Golden Pineapple
-                                    </Link>
-                                  </h2>
-                                  <div className="d-flex justify-content-between align-items-center mt-3">
-                                    <div>
-                                      <span className="text-dark">$13</span>{" "}
-                                      <span className="text-decoration-line-through text-muted">
-                                        $18
-                                      </span>
-                                    </div>
-                                    <div>
-                                      <small className="text-warning">
-                                        {" "}
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-half" />
-                                      </small>
-                                      <span>
-                                        <small>4.5</small>
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="d-grid mt-2">
-                                    <Link to="#!" className="btn btn-primary ">
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width={16}
-                                        height={16}
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth={2}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className="feather feather-plus"
-                                      >
-                                        <line x1={12} y1={5} x2={12} y2={19} />
-                                        <line x1={5} y1={12} x2={19} y2={12} />
-                                      </svg>{" "}
-                                      Add to cart{" "}
-                                    </Link>
-                                  </div>
-                                  <div className="d-flex justify-content-start text-center mt-3">
-                                    <div
-                                      className="deals-countdown w-100"
-                                      data-countdown="2022/11/11 00:00:00"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="images swiper-slide px-4">
-                            <div className="col">
-                              <div className="card card-product">
-                                <div className="card-body">
-                                  <div className="text-center  position-relative ">
-                                    {" "}
-                                    <Link to="#!">
-                                      <img
-                                        src={product13}
-                                        alt="Grocery Ecommerce Template"
-                                        className="mb-3 img-fluid"
-                                      />
-                                    </Link>
-                                    <div className="card-product-action">
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#quickViewModal"
-                                      >
-                                        <i
-                                          className="bi bi-eye"
-                                          data-bs-toggle="tooltip"
-                                          data-bs-html="true"
-                                          title="Quick View"
-                                        />
-                                      </Link>
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Wishlist"
-                                      >
-                                        <i className="bi bi-heart" />
-                                      </Link>
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Compare"
-                                      >
-                                        <i className="bi bi-arrow-left-right" />
-                                      </Link>
-                                    </div>
-                                  </div>
-                                  <div className="text-small mb-1">
-                                    <Link
-                                      to="#!"
-                                      className="text-decoration-none text-muted"
-                                    >
-                                      <small>Fruits &amp; Vegetables</small>
-                                    </Link>
-                                  </div>
-                                  <h2 className="fs-6">
-                                    <Link
-                                      to="#!"
-                                      className="text-inherit text-decoration-none"
-                                    >
-                                      Golden Pineapple
-                                    </Link>
-                                  </h2>
-                                  <div className="d-flex justify-content-between align-items-center mt-3">
-                                    <div>
-                                      <span className="text-dark">$13</span>{" "}
-                                      <span className="text-decoration-line-through text-muted">
-                                        $18
-                                      </span>
-                                    </div>
-                                    <div>
-                                      <small className="text-warning">
-                                        {" "}
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-fill" />
-                                        <i className="bi bi-star-half" />
-                                      </small>
-                                      <span>
-                                        <small>4.5</small>
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="d-grid mt-2">
-                                    <Link to="#!" className="btn btn-primary ">
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width={16}
-                                        height={16}
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth={2}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className="feather feather-plus"
-                                      >
-                                        <line x1={12} y1={5} x2={12} y2={19} />
-                                        <line x1={5} y1={12} x2={19} y2={12} />
-                                      </svg>{" "}
-                                      Add to cart{" "}
-                                    </Link>
-                                  </div>
-                                  <div className="d-flex justify-content-start text-center mt-3">
-                                    <div
-                                      className="deals-countdown w-100"
-                                      data-countdown="2022/11/11 00:00:00"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                          ))}
                         </Slider>
                       </div>
                     </div>
@@ -1343,7 +1055,7 @@ const Home = () => {
                               <p>
                                 Get your order delivered to your doorstep at the
                                 earliest from FreshCart pickup
-                                <p> stores near you.</p>
+                                <span> stores near you.</span>
                               </p>
                             </div>
                           </div>
@@ -1361,117 +1073,117 @@ const Home = () => {
               <div className="container">
                 <Slider {...settings2}>
                   <div className="images swiper-slide p-4">
-    <div className="item">
-      <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product6} alt="Grocery Ecommerce Template" className="mb-3 style={{paddingLeft:'40px'}} " />
-            <div>Dairy, Bread &amp; Eggs</div>
-          </div>
-        </div>
-     </Link>
-    </div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item"> 
-    <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product9} alt="Grocery Ecommerce Template" className="mb-3"style={{paddingLeft:'40px'}} />
-            <div>Snack &amp; Munchies</div>
-          </div>
-        </div>
-     </Link></div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item">
-       <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product3} alt="Grocery Ecommerce Template" className="mb-3"style={{paddingLeft:'40px'}} />
-            <div>Bakery &amp; Biscuits</div>
-          </div>
-        </div>
-     </Link></div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item"> 
-    <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product7} alt="Grocery Ecommerce Template " className="mb-3 " style={{paddingLeft:'40px'}} />
-            <div>Instant Food</div>
-          </div>
-        </div>
-     </Link></div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item"> 
-    <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product10} alt="Grocery Ecommerce Template" className="mb-3"style={{paddingLeft:'40px'}} />
-            <div>Tea, Coffee &amp; Drinks</div>
-          </div>
-        </div>
-     </Link></div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item">
-      <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product2} alt="Grocery Ecommerce Template" className="mb-3" style={{paddingLeft:'40px'}}/>
-            <div>Atta, Rice &amp; Dal</div>
-          </div>
-        </div>
-     </Link></div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item">
-       <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product1} alt="Grocery Ecommerce Template" className="mb-3" style={{paddingLeft:'40px'}}/>
-            <div>Baby Care</div>
-          </div>
-        </div>
-     </Link></div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item"> 
-    <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product4} alt="Grocery Ecommerce Template" className="mb-3" style={{paddingLeft:'40px'}}/>
-            <div>Chicken, Meat &amp; Fish</div>
-          </div>
-        </div>
-     </Link></div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item"> 
-    <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product5} alt="Grocery Ecommerce Template" className="mb-3" style={{paddingLeft:'40px'}}/>
-            <div>Cleaning Essentials</div>
-          </div>
-        </div>
-     </Link></div>
-  </div>
-  <div className="images swiper-slide p-4">
-    <div className="item">
-      <Link to="#" className="text-decoration-none text-inherit">
-        <div className="card card-product mb-4">
-          <div className="card-body text-center py-8">
-            <img src={product8} alt="Grocery Ecommerce Template" className="mb-3" style={{paddingLeft:'40px'}}/>
-            <div>Pet Care</div>
-          </div>
-        </div>
-     </Link>
-    </div>
-  </div>
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product6} alt="Grocery Ecommerce Template" className="mb-3 style={{paddingLeft:'40px'}} " />
+                            <div>Dairy, Bread &amp; Eggs</div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product9} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
+                            <div>Snack &amp; Munchies</div>
+                          </div>
+                        </div>
+                      </Link></div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product3} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
+                            <div>Bakery &amp; Biscuits</div>
+                          </div>
+                        </div>
+                      </Link></div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product7} alt="Grocery Ecommerce Template " className="mb-3 " style={{ paddingLeft: '40px' }} />
+                            <div>Instant Food</div>
+                          </div>
+                        </div>
+                      </Link></div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product10} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
+                            <div>Tea, Coffee &amp; Drinks</div>
+                          </div>
+                        </div>
+                      </Link></div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product2} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
+                            <div>Atta, Rice &amp; Dal</div>
+                          </div>
+                        </div>
+                      </Link></div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product1} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
+                            <div>Baby Care</div>
+                          </div>
+                        </div>
+                      </Link></div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product4} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
+                            <div>Chicken, Meat &amp; Fish</div>
+                          </div>
+                        </div>
+                      </Link></div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product5} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
+                            <div>Cleaning Essentials</div>
+                          </div>
+                        </div>
+                      </Link></div>
+                  </div>
+                  <div className="images swiper-slide p-4">
+                    <div className="item">
+                      <Link to="#" className="text-decoration-none text-inherit">
+                        <div className="card card-product mb-4">
+                          <div className="card-body text-center py-8">
+                            <img src={product8} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
+                            <div>Pet Care</div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
                   <div className="m-1">
                     <div className="partner-list">
                       <img
@@ -1480,7 +1192,7 @@ const Home = () => {
                         className="img-fluid "
                         alt="product"
                       />
-                      <h6 class="card-title partner">
+                      <h6 className="card-title partner">
                         <div>Baby Care</div>
                       </h6>
                     </div>
@@ -1493,7 +1205,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Atta, Rice &amp; Dal</div>
                       </h6>
                     </div>
@@ -1506,7 +1218,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Bakery &amp; Biscuits</div>
                       </h6>
                     </div>
@@ -1519,7 +1231,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Chicken, Meat &amp; Fish</div>
                       </h6>
                     </div>
@@ -1532,7 +1244,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Cleaning Essentials</div>
                       </h6>
                     </div>
@@ -1545,7 +1257,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Dairy, Bread &amp; Eggs</div>
                       </h6>
                     </div>
@@ -1558,7 +1270,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Instant Food</div>
                       </h6>
                     </div>
@@ -1571,7 +1283,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Pet Care</div>
                       </h6>
                     </div>
@@ -1584,7 +1296,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Snack &amp; Munchies</div>
                       </h6>
                     </div>
@@ -1597,7 +1309,7 @@ const Home = () => {
                         className="img-fluid"
                         alt="product"
                       />
-                      <h6 class="card-title">
+                      <h6 className="card-title">
                         <div>Tea, Coffee &amp; Drinks</div>
                       </h6>
                     </div>

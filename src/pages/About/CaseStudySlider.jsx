@@ -62,7 +62,7 @@ const Testimonials = () => {
             >
               {/* Testimonial items */}
               <div className="testmonail-item">
-                {/* <div class="owl-item"> */}
+                {/* <div className="owl-item"> */}
                 <div className="testmonail-box">
                   <div className="client-img">
                     <img src={member1} alt="Client" />
@@ -87,7 +87,7 @@ const Testimonials = () => {
               </div>
 
               <div className="testmonail-item">
-                {/* <div class="owl-item"> */}
+                {/* <div className="owl-item"> */}
                 <div className="testmonail-box">
                   <div className="client-img">
                     <img src={member2} alt="Client" />
@@ -110,7 +110,7 @@ const Testimonials = () => {
                 {/* </div> */}
               </div>
               <div className="testmonail-item">
-                {/* <div class="owl-item"> */}
+                {/* <div className="owl-item"> */}
                 <div className="testmonail-box">
                   <div className="client-img">
                     <img src={member3} alt="Client" />

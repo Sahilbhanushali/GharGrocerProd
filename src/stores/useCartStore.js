@@ -136,44 +136,62 @@ export const useCartStore = create((set, get) => ({
     }
   },
 
-loadCartFromAPI: async () => {
-  if (get().isInitialized) return;
+  loadCartFromAPI: async () => {
+    // CRITICAL FIX: Check if already initialized or currently loading
+    const state = get();
+    if (state.isInitialized || state.loading) {
+      console.log("Cart already initialized or loading, skipping...");
+      return;
+    }
 
-  const token = useAuthStore.getState().token;
-  if (!token) {
-    get().initializeCart();
-    set({ isInitialized: true });
-    return;
-  }
+    const token = useAuthStore.getState().token;
+    if (!token) {
+      get().initializeCart();
+      set({ isInitialized: true });
+      return;
+    }
 
-  set({ loading: true });
-  try {
-    const res = await CartAPI.get();
-    const items = res?.data?.data?.items || [];
-    console.log("API items:", items);
+    console.log("Loading cart from API...");
+    set({ loading: true });
     
-    const apiCart = items.map((it) => ({
-      ...it.product,
-      id: it.product_id,
-      qty: it.qty ?? 1,
-      price: Number(it.unit_price) || 0,
-      cartItemId: it.id,
-    }));
+    try {
+      const res = await CartAPI.get();
+      const items = res?.data?.data?.items || [];
+      console.log("API items:", items);
+      
+      const apiCart = items.map((it) => ({
+        ...it.product,
+        id: it.product_id,
+        qty: it.qty ?? 1,
+        price: Number(it.unit_price) || 0,
+        cartItemId: it.id,
+      }));
 
-    console.log("API cart:", apiCart);
+      console.log("API cart loaded successfully:", apiCart);
 
-    get().syncCart(apiCart);
-  } catch (err) {
-    console.error("Cart load failed:", err);
-    get().initializeCart();
-  } finally {
+      get().syncCart(apiCart);
+      set({ isInitialized: true });
+    } catch (err) {
+      console.error("Cart load failed:", err);
+      get().initializeCart();
+      set({ isInitialized: true });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // Add method to reset initialization (useful for logout)
+  resetCart: () => {
     set({
+      cart: [],
+      count: 0,
+      totalItems: 0,
+      totalPrice: 0,
       loading: false,
-      isInitialized: true,
+      isInitialized: false,
     });
-  }
-},
-
+    localStorage.removeItem("cart");
+  },
 
   isInCart: (productId) => get().cart.some((i) => i.id === productId),
 

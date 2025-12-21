@@ -106,7 +106,7 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
       title: 'Added to Cart',
       text: `${product.name} has been added to your cart!`,
       showConfirmButton: false,
-      timer: 2000,
+      timer: 900,
     });
   };
 
@@ -263,7 +263,7 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
                         </button>
 
                         {/* Wishlist Button */}
-                        <button
+                        {/* <button
                           className="btn-action wishlist-btn position-absolute z-3"
                           onClick={(e) => {
                             e.preventDefault();
@@ -273,7 +273,7 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
                           title="Wishlist"
                         >
                           <i className="bi bi-heart"></i>
-                        </button>
+                        </button> */}
                       </div>
 
                       {/* Product Details */}

@@ -2,7 +2,7 @@ import { axiosInstance } from "../../lib/axios";
 
 export const ProductApi = {
 
-    fetchAllProducts: (params = {}) =>
+    fetchAllProducts: (params) =>
         axiosInstance.get("/product", { params }),
 
     fetchProductByIdAPI: (productId) =>

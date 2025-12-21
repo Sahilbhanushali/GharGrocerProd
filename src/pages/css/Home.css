@@ -1,0 +1,276 @@
+/* Daily Best Sells Section - Complete Fix */
+
+/* Target only the Daily Best Sells slider */
+.daily-best-sells-slider .images.swiper-slide {
+  height: 100%;
+  display: flex;
+  padding: 0 8px !important; /* Consistent spacing */
+}
+
+.daily-best-sells-slider .images.swiper-slide .col {
+  height: 100%;
+  width: 100%;
+}
+
+/* Make cards in Daily Best Sells section uniform height */
+.daily-best-sells-slider .card.card-product {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.daily-best-sells-slider .card.card-product:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.daily-best-sells-slider .card.card-product .card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.25rem;
+}
+
+/* Image container - fixed height and centered */
+.daily-best-sells-slider .card.card-product .text-center.position-relative {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.daily-best-sells-slider .card.card-product .text-center.position-relative img {
+  max-height: 180px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Content section - grows to push button to bottom */
+.daily-best-sells-slider .card.card-product .card-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Category text */
+.daily-best-sells-slider .card.card-product .text-small {
+  min-height: 20px;
+}
+
+/* Product title - fixed height to prevent overflow */
+.daily-best-sells-slider .card.card-product h2.fs-6 {
+  min-height: 40px;
+  max-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+/* Price and rating section */
+.daily-best-sells-slider .card.card-product .d-flex.justify-content-between {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  align-items: center;
+}
+
+.daily-best-sells-slider .card.card-product .text-dark {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.daily-best-sells-slider .card.card-product .text-decoration-line-through {
+  font-size: 0.9rem;
+}
+
+/* Rating stars */
+.daily-best-sells-slider .card.card-product .text-warning i {
+  font-size: 0.75rem;
+}
+
+/* Button stays at bottom */
+.daily-best-sells-slider .card.card-product .d-grid {
+  margin-top: 0.75rem;
+}
+
+.daily-best-sells-slider .card.card-product .btn-primary {
+  padding: 0.625rem 1rem;
+  font-weight: 500;
+}
+
+/* Countdown section */
+.daily-best-sells-slider .card.card-product .deals-countdown {
+  margin-top: 0.75rem;
+  min-height: 30px;
+}
+
+/* Banner card in Daily Best Sells */
+.daily-best-sells-banner {
+  height: 100%;
+  min-height: 480px;
+  display: flex;
+  align-items: flex-end;
+  padding: 2rem !important;
+  position: relative;
+}
+
+.daily-best-sells-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+  border-radius: 0.5rem;
+}
+
+.daily-best-sells-banner > div {
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .daily-best-sells-slider .card.card-product {
+    min-height: 460px;
+  }
+  
+  .daily-best-sells-banner {
+    min-height: 460px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .daily-best-sells-slider .card.card-product {
+    min-height: 440px;
+  }
+  
+  .daily-best-sells-banner {
+    min-height: 440px;
+  }
+  
+  .daily-best-sells-slider .card.card-product .text-center.position-relative {
+    height: 180px;
+  }
+  
+  .daily-best-sells-slider .card.card-product .text-center.position-relative img {
+    max-height: 160px;
+  }
+}
+
+@media (max-width: 992px) {
+  .daily-best-sells-slider .card.card-product {
+    min-height: 420px;
+  }
+  
+  .daily-best-sells-banner {
+    min-height: 300px;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .daily-best-sells-slider .card.card-product {
+    min-height: 400px;
+  }
+  
+  .daily-best-sells-banner {
+    min-height: 280px;
+    margin-bottom: 1rem;
+  }
+  
+  .daily-best-sells-slider .card.card-product .text-center.position-relative {
+    height: 160px;
+  }
+  
+  .daily-best-sells-slider .card.card-product .text-center.position-relative img {
+    max-height: 140px;
+  }
+  
+  .daily-best-sells-slider .images.swiper-slide {
+    padding: 0 6px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .daily-best-sells-slider .card.card-product {
+    min-height: 380px;
+  }
+  
+  .daily-best-sells-banner {
+    min-height: 250px;
+  }
+  
+  .daily-best-sells-slider .card.card-product .text-center.position-relative {
+    height: 150px;
+  }
+  
+  .daily-best-sells-slider .card.card-product .text-center.position-relative img {
+    max-height: 130px;
+  }
+  
+  .daily-best-sells-slider .card.card-product .card-body {
+    padding: 1rem;
+  }
+}
+
+/* Slick slider adjustments for Daily Best Sells */
+.daily-best-sells-slider .slick-slide {
+  height: auto;
+  display: flex !important;
+}
+
+.daily-best-sells-slider .slick-slide > div {
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+.daily-best-sells-slider .slick-track {
+  display: flex !important;
+  align-items: stretch;
+}
+
+.daily-best-sells-slider .slick-list {
+  padding-bottom: 1rem;
+  margin: 0 -8px; /* Compensate for slide padding */
+}
+
+/* Arrow positioning */
+.daily-best-sells-slider .slick-prev,
+.daily-best-sells-slider .slick-next {
+  z-index: 10;
+}
+
+.daily-best-sells-slider .slick-prev {
+  left: -15px;
+}
+
+.daily-best-sells-slider .slick-next {
+  right: -15px;
+}
+
+/* Dots styling */
+.daily-best-sells-slider .slick-dots {
+  bottom: -30px;
+}
+
+.daily-best-sells-slider .slick-dots li button:before {
+  font-size: 8px;
+}
