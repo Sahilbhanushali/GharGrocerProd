@@ -38,11 +38,14 @@ import Coupons from "./pages/FooterElements/Coupons";
 import Careers from "./pages/FooterElements/Careers";
 import HelpCenter from "./pages/FooterElements/HelpCenter";
 import CompleteProfile from "./Component/completeProfile.jsx";
+import SingleProduct from "./pages/singleProductPage/SingleProduct.jsx";
+import RequireAuth from "./routes/RequireAuth.jsx";
+import CategoryGroupPage from "./pages/categoryGroup/categoryGroupPage.js"
 const App = () => {
   return (
     <div>
       <Router>
-        <Header/>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           {/* Shop pages */}
@@ -50,7 +53,14 @@ const App = () => {
           <Route path="/ShopGridCol3" element={<ShopGridCol3 />} />
           <Route path="/ShopListCol" element={<ShopListCol />} />
           <Route path="/ShopWishList" element={<ShopWishList />} />
-          <Route path="/ShopCheckOut" element={<ShopCheckOut />} />
+          <Route
+            path="/ShopCheckOut"
+            element={
+              <RequireAuth>
+                <ShopCheckOut />
+              </RequireAuth>
+            }
+          />
           <Route path="/ShopCart" element={<ShopCart />} />
           {/* Store pages */}
           <Route path="/StoreList" element={<StoreList />} />
@@ -74,10 +84,14 @@ const App = () => {
           <Route path="/Coupons" element={<Coupons />} />
           <Route path="/Careers" element={<Careers />} />
           <Route path="/helpcenter" element={<HelpCenter />} />
+          {/* productPage */}
+          <Route path="/single-product/:id" element={<SingleProduct />} />
+          {/* categoryGroup */}
+          <Route path="/category-group/:id" element={<CategoryGroupPage />} />
           {/* Complete Profile */}
           <Route path="/complete-profile" element={<CompleteProfile />} />
         </Routes>
-        <Footer/>
+        <Footer />
       </Router>
     </div>
   );

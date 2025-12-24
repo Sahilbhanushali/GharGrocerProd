@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useWishlistStore } from "../stores/useWishListStore.js";
 import { useCartStore } from "../stores/useCartStore.js";
-import { fetchProducts } from "../api/helpers/fetchProducts.js";
+import { fetchProducts, fetchProductsByCategorySlug } from "../api/helpers/fetchProducts.js";
 import ProductSkeleton from "../components/skeletons/productSkeleton.jsx";
 import { fetchImagePathFromENV } from "../api/helpers/fetcheImagesPathFromENV.js";
 import Slider from "react-slick";
@@ -12,7 +12,12 @@ import "slick-carousel/slick/slick-theme.css";
 import "./css/ProductCarousel.css";
 import QuickViewModal from "./QuickViewModal.jsx";
 
-const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit = 10 }) => {
+const ProductCarousel = ({ 
+  title = "Popular Products", 
+  categoryId = null, 
+  categorySlug = null, 
+  limit = 10 
+}) => {
   const addToWishlist = useWishlistStore((state) => state.addToWishlist);
   const addToCart = useCartStore((state) => state.addToCart);
   const [products, setProducts] = useState([]);
@@ -25,7 +30,7 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
 
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: false,
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 1,
@@ -48,6 +53,7 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
     autoplaySpeed: 3000,
   };
 
+  // Intersection Observer for lazy loading
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -69,41 +75,66 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
     };
   }, [hasLoaded]);
 
+  // Load products
   useEffect(() => {
     const loadProducts = async () => {
       if (!inView || hasLoaded) return;
-      
+
       try {
         setLoading(true);
-        const productData = await fetchProducts(categoryId, limit);
-        
-        if (productData.success && productData.data?.data) {
-          setProducts(productData.data.data);
+        let productData;
+
+    
+        if (categorySlug) {
+          console.log("Fetching by category slug:", categorySlug);
+          productData = await fetchProductsByCategorySlug(categorySlug);
+        } else if (categoryId) {
+          console.log("Fetching by category ID:", categoryId);
+          const params = { category_id: categoryId, limit: limit };
+          productData = await fetchProducts(params);
         } else {
-          setProducts(productData.data || productData || []);
+          console.log("Fetching all products with limit:", limit);
+          const params = { limit: limit };
+          productData = await fetchProducts(params);
         }
+
+        console.log("Loaded products:", productData);
+
+        // Handle different response structures
+        if (Array.isArray(productData)) {
+          setProducts(productData);
+        } else if (productData?.data) {
+          setProducts(Array.isArray(productData.data) ? productData.data : []);
+        } else {
+          setProducts([]);
+        }
+
         setHasLoaded(true);
       } catch (error) {
-        setError("Error in fetching products: " + error.message);
         console.error("Error fetching products:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to load products. Please try again.',
-        });
+        setError("Failed to load products");
+        // Don't show alert for every error
+        if (!error.message?.includes("Network")) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to load products. Please try again.",
+            showConfirmButton: true,
+          });
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadProducts();
-  }, [inView, categoryId, limit, hasLoaded]);
+  }, [inView, categoryId, categorySlug, limit, hasLoaded]);
 
   const handleAddToCart = (product) => {
     addToCart(product);
     Swal.fire({
-      icon: 'success',
-      title: 'Added to Cart',
+      icon: "success",
+      title: "Added to Cart",
       text: `${product.name} has been added to your cart!`,
       showConfirmButton: false,
       timer: 900,
@@ -113,8 +144,8 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
   const handleAddToWishlist = (product) => {
     addToWishlist(product);
     Swal.fire({
-      icon: 'success',
-      title: 'Added to Wishlist',
+      icon: "success",
+      title: "Added to Wishlist",
       text: `${product.name} has been added to your wishlist!`,
       showConfirmButton: false,
       timer: 2000,
@@ -142,13 +173,14 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
     return "Uncategorized";
   };
 
+  // Loading state
   if (loading && !hasLoaded) {
     return (
       <div className="container" ref={containerRef}>
         <div className="row">
           <div className="col-12 mb-4">
             <div className="section-head text-center">
-              <h3 className='h3style'>{title}</h3>
+              <h3 className="h3style">{title}</h3>
               <div className="wt-separator bg-primarys"></div>
               <div className="wt-separator2 bg-primarys"></div>
             </div>
@@ -165,6 +197,7 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="container" ref={containerRef}>
@@ -175,11 +208,12 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
     );
   }
 
+  // No products state
   if (!products || products.length === 0) {
     return (
       <div className="container" ref={containerRef}>
         <div className="section-head text-center mb-4">
-          <h3 className='h3style'>{title}</h3>
+          <h3 className="h3style">{title}</h3>
           <div className="wt-separator bg-primarys"></div>
           <div className="wt-separator2 bg-primarys"></div>
         </div>
@@ -198,13 +232,13 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
           <div className="row">
             <div className="col-12 mb-6">
               <div className="section-head text-center">
-                <h3 className='h3style'>{title}</h3>
+                <h3 className="h3style">{title}</h3>
                 <div className="wt-separator bg-primarys"></div>
                 <div className="wt-separator2 bg-primarys"></div>
               </div>
             </div>
           </div>
-          
+
           <Slider {...settings}>
             {products.map((product) => {
               const discountPercent = getDiscountPercentage(
@@ -220,11 +254,12 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
                         {/* Discount Badge */}
                         {discountPercent && (
                           <div className="position-absolute start-0 top-50 translate-middle-y z-3">
-                            <span className="badge bg-danger fs-6">{discountPercent}% OFF</span>
+                            <span className="badge bg-danger fs-6">
+                              {discountPercent}% OFF
+                            </span>
                           </div>
                         )}
 
-                        
                         {/* Featured Badge */}
                         {product.featured && (
                           <div className="position-absolute top-0 end-0 z-3">
@@ -233,23 +268,25 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
                         )}
 
                         {/* Product Image */}
-                        <Link to={`/product/${product.slug}`}>
+                        <Link to={`/single-product/${product.id}`}>
                           <div className="product-image-wrapper">
                             <img
-                              src={product.images && product.images.length > 0 
-                                ? fetchImagePathFromENV() + product.images[0]
-                                : "https://via.placeholder.com/300x300?text=Product+Image"
+                              src={
+                                product.images && product.images.length > 0
+                                  ? fetchImagePathFromENV() + product.images[0]
+                                  : "https://via.placeholder.com/300x300?text=Product+Image"
                               }
                               alt={product.name}
                               className="product-image img-fluid"
                               onError={(e) => {
-                                e.target.src = "https://via.placeholder.com/300x300?text=Product+Image";
+                                e.target.src =
+                                  "https://via.placeholder.com/300x300?text=Product+Image";
                               }}
                             />
                           </div>
                         </Link>
 
-                        {/* Quick View Button - FIXED */}
+                        {/* Quick View Button */}
                         <button
                           className="btn-quick-view position-absolute z-3"
                           onClick={(e) => {
@@ -261,19 +298,6 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
                         >
                           <i className="bi bi-eye"></i>
                         </button>
-
-                        {/* Wishlist Button */}
-                        {/* <button
-                          className="btn-action wishlist-btn position-absolute z-3"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleAddToWishlist(product);
-                          }}
-                          title="Wishlist"
-                        >
-                          <i className="bi bi-heart"></i>
-                        </button> */}
                       </div>
 
                       {/* Product Details */}
@@ -289,8 +313,8 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
                           className="text-inherit text-decoration-none"
                           title={product.name}
                         >
-                          {product.name.length > 50 
-                            ? `${product.name.substring(0, 50)}...` 
+                          {product.name.length > 50
+                            ? `${product.name.substring(0, 50)}...`
                             : product.name}
                         </Link>
                       </h2>
@@ -311,11 +335,13 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
                           <span className="text-dark fs-5 fw-bold">
                             ₹{parseFloat(product.price).toFixed(2)}
                           </span>
-                          {product.old_price && parseFloat(product.old_price) > parseFloat(product.price) && (
-                            <span className="text-decoration-line-through text-muted ms-2 fs-6">
-                              ₹{parseFloat(product.old_price).toFixed(2)}
-                            </span>
-                          )}
+                          {product.old_price &&
+                            parseFloat(product.old_price) >
+                              parseFloat(product.price) && (
+                              <span className="text-decoration-line-through text-muted ms-2 fs-6">
+                                ₹{parseFloat(product.old_price).toFixed(2)}
+                              </span>
+                            )}
                         </div>
                         <button
                           className="btn btn-primary btn-sm px-3"
@@ -330,11 +356,13 @@ const ProductCarousel = ({ title = "Popular Products", categoryId = null, limit 
                       <div className="mb-2">
                         {product.qty > 0 ? (
                           <small className="text-success">
-                            <i className="bi bi-check-circle-fill me-1"></i>In Stock
+                            <i className="bi bi-check-circle-fill me-1"></i>In
+                            Stock
                           </small>
                         ) : (
                           <small className="text-danger">
-                            <i className="bi bi-x-circle-fill me-1"></i>Out of Stock
+                            <i className="bi bi-x-circle-fill me-1"></i>Out of
+                            Stock
                           </small>
                         )}
                       </div>

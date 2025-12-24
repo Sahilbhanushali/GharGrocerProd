@@ -1,7 +1,6 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import groceryshop from "../images/Grocerylogo.png";
+import GG_logo_artwork from "../logo/GG_logo_artwork-01.png";
 import amazonpay from "../images/amazonpay.svg";
 import american from "../images/american-express.svg";
 import mastercard from "../images/mastercard.svg";
@@ -23,7 +22,7 @@ const Footer = () => {
                   <div className="footer-logo">
                     <Link to="/">
                       <img
-                        src={groceryshop}
+                        src={GG_logo_artwork}
                         style={{ width: 300, padding: 20, marginLeft: "-30px" }}
                         alt="logo"
                       />

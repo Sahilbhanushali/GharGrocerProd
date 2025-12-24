@@ -1,7 +1,6 @@
-import {ProductApi} from "../products/product.api.js";
+import { ProductApi } from "../products/product.api.js";
 
-
-export const fetchProducts = async(params) => {
+export const fetchProducts = async (params = {}) => {
     try {
         const response = await ProductApi.fetchAllProducts(params);
         return response.data.data;
@@ -11,8 +10,18 @@ export const fetchProducts = async(params) => {
     }
 }
 
+export const fetchProductsByCategorySlug = async (categorySlug) => {
+    try {
+        const params = { category_slug: categorySlug };
+        const response = await ProductApi.fetchProductsByCategory(params);
+        return response.data.data;
+    } catch (error) {
+        console.error("Error fetching products by category:", error);
+        throw error;
+    }
+}
 
-export const fetchProductById = async(productId) => {
+export const fetchProductById = async (productId) => {
     try {
         const response = await ProductApi.fetchProductByIdAPI(productId);
         return response.data.data;

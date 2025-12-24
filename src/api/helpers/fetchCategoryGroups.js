@@ -19,8 +19,13 @@ export const FetchALlCategoryGroupsDetails = async () => {
 
     export const fetchCategoryGroupDetailsById = async(id) => {
       try{
-        const response = await axiosInstance.get(`/category_group/${id}`);
-        return response.data.data;
+        const response = await axiosInstance.get("/category_group/show",{
+          params:{
+            id : id
+          },
+        });
+        
+        return response.data.data.data;
       }catch(error){
         console.error("Error fetching category group by ID:", error);
         throw new Error("Error in fetching category group by ID" + error.message);  

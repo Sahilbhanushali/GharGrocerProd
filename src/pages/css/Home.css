@@ -274,3 +274,116 @@
 .daily-best-sells-slider .slick-dots li button:before {
   font-size: 8px;
 }
+
+
+
+/* Brand Section Styles - Add to Home.css */
+
+.brand-slider-wrapper {
+  padding: 0 15px;
+}
+
+.brand-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  background: #fff;
+}
+
+.brand-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-color: #0aad0a;
+}
+
+.brand-image-wrapper {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.brand-card:hover .brand-image-wrapper {
+  background-color: #e9f7ef;
+}
+
+.brand-image {
+  transition: transform 0.3s ease;
+}
+
+.brand-card:hover .brand-image {
+  transform: scale(1.1);
+}
+
+.brand-name {
+  font-size: 0.95rem;
+  color: #333;
+  margin-top: 10px;
+  transition: color 0.3s ease;
+}
+
+.brand-card:hover .brand-name {
+  color: #0aad0a;
+}
+
+/* Slider Arrow Customization */
+.brand-slider-wrapper .slick-prev,
+.brand-slider-wrapper .slick-next {
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  background-color: #0aad0a;
+  border-radius: 50%;
+}
+
+.brand-slider-wrapper .slick-prev:hover,
+.brand-slider-wrapper .slick-next:hover {
+  background-color: #088a08;
+}
+
+.brand-slider-wrapper .slick-prev {
+  left: -20px;
+}
+
+.brand-slider-wrapper .slick-next {
+  right: -20px;
+}
+
+.brand-slider-wrapper .slick-prev:before,
+.brand-slider-wrapper .slick-next:before {
+  font-size: 20px;
+  opacity: 1;
+}
+
+.brand-slider-wrapper .slick-disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .brand-slider-wrapper .slick-prev {
+    left: -10px;
+  }
+  
+  .brand-slider-wrapper .slick-next {
+    right: -10px;
+  }
+
+  .brand-image-wrapper {
+    height: 80px;
+  }
+}
+
+@media (max-width: 576px) {
+  .brand-slider-wrapper {
+    padding: 0 10px;
+  }
+
+  .brand-card {
+    margin: 0 5px;
+  }
+}

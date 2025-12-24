@@ -10,29 +10,14 @@ import iphone from "../images/iphone-2.png";
 import googleplay from "../images/googleplay-btn.svg";
 import appstore from "../images/appstore-btn.svg";
 import bannerdeal from "../images/banner-deal1.jpg";
-import product11 from "../images/product-img-11.jpg";
-import product12 from "../images/product-img-12.jpg";
-import product13 from "../images/product-img-13.jpg";
 import clock from "../images/clock.svg";
 import gift from "../images/gift.svg";
 import package1 from "../images/package.svg";
 import refresh from "../images/refresh-cw.svg";
-import product1 from "../images/category-baby-care.jpg";
-import product2 from "../images/category-atta-rice-dal.jpg";
-import product3 from "../images/category-bakery-biscuits.jpg";
-import product4 from "../images/category-chicken-meat-fish.jpg";
-import product5 from "../images/category-cleaning-essentials.jpg";
-import product6 from "../images/category-dairy-bread-eggs.jpg";
-import product7 from "../images/category-instant-food.jpg";
-import product8 from "../images/category-pet-care.jpg";
-import product9 from "../images/category-snack-munchies.jpg";
-import product10 from "../images/category-tea-coffee-drinks.jpg";
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
-import ProductItem from "../ProductList/ProductItem";
+import { useState } from "react";
 import Slider from "react-slick";
 import { axiosInstance } from "../lib/axios.js";
-
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Slide, Zoom } from "react-awesome-reveal";
@@ -40,7 +25,6 @@ import { useEffect } from "react";
 import { MagnifyingGlass } from "react-loader-spinner";
 import FAQ from "./FooterElements/Faq";
 import { fetchImagePathFromENV } from "../api/helpers/fetcheImagesPathFromENV.js";
-
 import { FetchALlCategoryGroupsDetails } from "../api/helpers/fetchCategoryGroups.js";
 import { useCartStore } from "../stores/useCartStore.js";
 import QuickViewModal from "../Component/QuickViewModal.jsx";
@@ -48,6 +32,7 @@ import ProductCarousel from "../Component/ProductCarousel.jsx";
 import { fetchProducts } from "../api/helpers/fetchProducts.js"
 import "../pages/css/Home.css"
 import Swal from "sweetalert2";
+import { FetchALlBrands } from "../api/helpers/fetchBrands.js"
 
 const Home = () => {
 
@@ -59,6 +44,10 @@ const Home = () => {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingFeaturedProducts, setLoadingFeaturedProducts] = useState(true);
   const addToCart = useCartStore((state) => state.addToCart);
+  const [brands, setBrands] = useState([]);
+  const [brandPage, setBrandPage] = useState(1);
+  const [brandLastPage, setBrandLastPage] = useState(1);
+  const [loadingBrands, setLoadingBrands] = useState(true);
 
   const [quickViewModal, setQuickViewModal] = useState({
     show: false,
@@ -178,6 +167,49 @@ const Home = () => {
 
   }, [])
 
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        setLoadingBrands(true);
+        const res = await FetchALlBrands(brandPage, 10);
+
+        console.log('Brands API Response:', res);
+
+        // Handle the API response structure
+        if (res && res.data) {
+          const pageData = res.data;
+          setBrands(pageData.data || []);
+          setBrandLastPage(pageData.last_page || 1);
+        }
+      } catch (error) {
+        console.error("Failed to fetch brands:", error);
+        setBrands([]);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to load brands',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      } finally {
+        setLoadingBrands(false);
+      }
+    };
+
+    fetchBrands();
+  }, [brandPage]);
+  const handleBrandNext = () => {
+    if (brandPage < brandLastPage) {
+      setBrandPage(prev => prev + 1);
+    }
+  };
+
+  const handleBrandPrev = () => {
+    if (brandPage > 1) {
+      setBrandPage(prev => prev - 1);
+    }
+  };
+
   const settings1 = {
     dots: true,
     infinite: true,
@@ -239,65 +271,86 @@ const Home = () => {
     autoplaySpeed: 2000,
   };
   const settings2 = {
-    dots: true,
-    infinite: true,
+    dots: false,
+    infinite: false,
     speed: 500,
     slidesToShow: 5,
-    slidesToScroll: 2,
-    initialSlide: 1,
+    slidesToScroll: 5,
+    initialSlide: 0,
     responsive: [
-      {
-        breakpoint: 1600,
-        settings: {
-          slidesToShow: 5,
-          slidesToScroll: 1,
-          infinite: true,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 4,
-          slidesToScroll: 1,
-          initialSlide: 1,
-        },
-      },
-      {
-        breakpoint: 900,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          initialSlide: 1,
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          initialSlide: 1,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          initialSlide: 1,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
+      { breakpoint: 1600, settings: { slidesToShow: 5, slidesToScroll: 5 } },
+      { breakpoint: 1024, settings: { slidesToShow: 4, slidesToScroll: 4 } },
+      { breakpoint: 900, settings: { slidesToShow: 3, slidesToScroll: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 3, slidesToScroll: 3 } },
+      { breakpoint: 600, settings: { slidesToShow: 2, slidesToScroll: 2 } },
+      { breakpoint: 480, settings: { slidesToShow: 1, slidesToScroll: 1 } },
     ],
-    autoplay: true,
-    autoplaySpeed: 2000,
+    autoplay: false,
+    // When user clicks next/prev, move API page when at ends
+    afterChange: (current) => {
+      const totalSlides = brands.length;
+      const lastVisible = current + settings2.slidesToShow;
+      if (lastVisible >= totalSlides && brandPage < brandLastPage) {
+        setBrandPage((p) => p + 1);
+      }
+      if (current === 0 && brandPage > 1) {
+        setBrandPage((p) => p - 1);
+      }
+    },
   };
+
+  const brandSliderSettings = {
+  dots: false,
+  infinite: false,
+  speed: 500,
+  slidesToShow: 6,
+  slidesToScroll: 1,
+  arrows: true,
+  responsive: [
+    { 
+      breakpoint: 1600, 
+      settings: { 
+        slidesToShow: 6, 
+        slidesToScroll: 1 
+      } 
+    },
+    { 
+      breakpoint: 1400, 
+      settings: { 
+        slidesToShow: 5, 
+        slidesToScroll: 1 
+      } 
+    },
+    { 
+      breakpoint: 1200, 
+      settings: { 
+        slidesToShow: 4, 
+        slidesToScroll: 1 
+      } 
+    },
+    { 
+      breakpoint: 992, 
+      settings: { 
+        slidesToShow: 3, 
+        slidesToScroll: 1 
+      } 
+    },
+    { 
+      breakpoint: 768, 
+      settings: { 
+        slidesToShow: 2, 
+        slidesToScroll: 1 
+      } 
+    },
+    { 
+      breakpoint: 576, 
+      settings: { 
+        slidesToShow: 1, 
+        slidesToScroll: 1 
+      } 
+    },
+  ],
+};
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
@@ -568,7 +621,7 @@ const Home = () => {
                           <Zoom>
                             <div className="text-center mb-10">
                               {/* img */}
-                              <Link to={`/categories/${category.id}`}>
+                              <Link to={`/category-group/${category.id}`}>
                                 <img
                                   src={`${fetchImagePathFromENV() +
                                     category.image
@@ -690,7 +743,7 @@ const Home = () => {
                         <div className="mb-6">
                           <div className="mb-7">
                             {/* heading */}
-                            <h1>Get the FreshCart app</h1>
+                            <h1>Get the Ghar Grocer app</h1>
                             <h5 className="mb-0">
                               We will send you a link, open it on your phone to
                               download the app.
@@ -699,34 +752,11 @@ const Home = () => {
                           <div className="mb-5">
                             {/* form check */}
                             <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="radio"
-                                name="flexRadioDefault"
-                                id="flexRadioDefault1"
-                              />
-                              <label
-                                className="form-check-label"
-                                htmlFor="flexRadioDefault1"
-                              >
-                                Email
-                              </label>
+
                             </div>
                             {/* form check */}
                             <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="radio"
-                                name="flexRadioDefault"
-                                id="flexRadioDefault2"
-                                defaultChecked
-                              />
-                              <label
-                                className="form-check-label"
-                                htmlFor="flexRadioDefault2"
-                              >
-                                Phone
-                              </label>
+
                             </div>
                             <QuickViewModal
                               show={quickViewModal.show}
@@ -784,7 +814,6 @@ const Home = () => {
               </section>
             </>
             <>
-             // Replace your Daily Best Sells section with this improved version
 
               <section className="my-lg-14 my-8">
                 <div className="container">
@@ -837,7 +866,7 @@ const Home = () => {
                                   <div className="card-body">
                                     {/* Product Image Container */}
                                     <div className="text-center position-relative">
-                                      <Link to={`/product/${product.id}`}>
+                                      <Link to={`/single-product/${product.id}`}>
                                         <img
                                           src={
                                             product.images?.[0]
@@ -1066,256 +1095,107 @@ const Home = () => {
                 </div>
               </section>
             </>
+           
             <>
-              <FAQ />
+              <section className="my-lg-14 my-8">
+                <div className="container">
+                  <div className="section-head text-center mb-6">
+                    <h3 className="h3style" data-title="Our Brands">
+                      Our Brands
+                    </h3>
+                    <div className="wt-separator bg-primarys"></div>
+                    <div className="wt-separator2 bg-primarys"></div>
+                  </div>
+
+                  {loadingBrands ? (
+                    <div className="text-center py-5">
+                      <MagnifyingGlass
+                        visible={true}
+                        height="80"
+                        width="80"
+                        ariaLabel="magnifying-glass-loading"
+                        glassColor="#c0efff"
+                        color="#0aad0a"
+                      />
+                      <p className="mt-3">Loading brands...</p>
+                    </div>
+                  ) : brands.length === 0 ? (
+                    <div className="text-center py-5">
+                      <i className="bi bi-inbox fs-1 text-muted"></i>
+                      <p className="mt-3 text-muted">No brands available</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="position-relative brand-slider-wrapper">
+                        <Slider {...brandSliderSettings}>
+                          {brands.map((brand) => (
+                            <div className="p-3" key={brand.id}>
+                              <div className="card card-product mb-3 h-100 brand-card">
+                                <div className="card-body text-center py-4">
+                                  <Link
+                                    to={`/brands/${brand.id}`}
+                                    className="text-decoration-none text-inherit"
+                                  >
+                                    <div className="mb-3 d-flex justify-content-center align-items-center brand-image-wrapper">
+                                      <img
+                                        src={fetchImagePathFromENV() + brand.image}
+                                        alt={brand.name}
+                                        className="img-fluid brand-image"
+                                        style={{
+                                          maxHeight: 80,
+                                          maxWidth: '100%',
+                                          objectFit: 'contain',
+                                        }}
+                                        onError={(e) => {
+                                          e.target.src =
+                                            "https://via.placeholder.com/150x80?text=Brand";
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="fw-semibold brand-name">{brand.name}</div>
+                                    {brand.products_count > 0 && (
+                                      <small className="text-muted">
+                                        {brand.products_count} product
+                                        {brand.products_count > 1 ? "s" : ""}
+                                      </small>
+                                    )}
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </Slider>
+                      </div>
+
+                      {/* Pagination Controls */}
+                      {brandLastPage > 1 && (
+                        <div className="d-flex justify-content-center align-items-center mt-4 gap-3">
+                          <button
+                            className="btn btn-outline-primary btn-sm"
+                            onClick={handleBrandPrev}
+                            disabled={brandPage <= 1}
+                          >
+                            <i className="bi bi-chevron-left"></i> Previous
+                          </button>
+                          <span className="text-muted">
+                            Page {brandPage} of {brandLastPage}
+                          </span>
+                          <button
+                            className="btn btn-outline-primary btn-sm"
+                            onClick={handleBrandNext}
+                            disabled={brandPage >= brandLastPage}
+                          >
+                            Next <i className="bi bi-chevron-right"></i>
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </section>
             </>
-            <>
-              <div className="container">
-                <Slider {...settings2}>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product6} alt="Grocery Ecommerce Template" className="mb-3 style={{paddingLeft:'40px'}} " />
-                            <div>Dairy, Bread &amp; Eggs</div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product9} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
-                            <div>Snack &amp; Munchies</div>
-                          </div>
-                        </div>
-                      </Link></div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product3} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
-                            <div>Bakery &amp; Biscuits</div>
-                          </div>
-                        </div>
-                      </Link></div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product7} alt="Grocery Ecommerce Template " className="mb-3 " style={{ paddingLeft: '40px' }} />
-                            <div>Instant Food</div>
-                          </div>
-                        </div>
-                      </Link></div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product10} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
-                            <div>Tea, Coffee &amp; Drinks</div>
-                          </div>
-                        </div>
-                      </Link></div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product2} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
-                            <div>Atta, Rice &amp; Dal</div>
-                          </div>
-                        </div>
-                      </Link></div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product1} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
-                            <div>Baby Care</div>
-                          </div>
-                        </div>
-                      </Link></div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product4} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
-                            <div>Chicken, Meat &amp; Fish</div>
-                          </div>
-                        </div>
-                      </Link></div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product5} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
-                            <div>Cleaning Essentials</div>
-                          </div>
-                        </div>
-                      </Link></div>
-                  </div>
-                  <div className="images swiper-slide p-4">
-                    <div className="item">
-                      <Link to="#" className="text-decoration-none text-inherit">
-                        <div className="card card-product mb-4">
-                          <div className="card-body text-center py-8">
-                            <img src={product8} alt="Grocery Ecommerce Template" className="mb-3" style={{ paddingLeft: '40px' }} />
-                            <div>Pet Care</div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product1}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid "
-                        alt="product"
-                      />
-                      <h6 className="card-title partner">
-                        <div>Baby Care</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product2}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Atta, Rice &amp; Dal</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product3}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Bakery &amp; Biscuits</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product4}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Chicken, Meat &amp; Fish</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product5}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Cleaning Essentials</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product6}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Dairy, Bread &amp; Eggs</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product7}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Instant Food</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product8}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Pet Care</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product9}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Snack &amp; Munchies</div>
-                      </h6>
-                    </div>
-                  </div>
-                  <div className="m-1">
-                    <div className="partner-list">
-                      <img
-                        src={product10}
-                        style={{ objectFit: "cover" }}
-                        className="img-fluid"
-                        alt="product"
-                      />
-                      <h6 className="card-title">
-                        <div>Tea, Coffee &amp; Drinks</div>
-                      </h6>
-                    </div>
-                  </div>
-                </Slider>
-              </div>
+             <>
+              <FAQ />
             </>
           </>
         )}
